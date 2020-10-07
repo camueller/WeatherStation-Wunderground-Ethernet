@@ -7,13 +7,14 @@
 // Variables
 //////////////
 
-const unsigned long RAIN_INTERVAL_SECONDS                   = 300;
-const          int  RAIN_INTERVALS                          = 12; // 12 * 5min = 60 min
+const unsigned long RAIN_INTERVAL_SECONDS = 300;
+const          int  RAIN_INTERVALS = 12; // 12 * 5min = 60 min
+const          float MM_PER_SIGNAL = 0.2794;
 unsigned       int  rainSignalCountInterval[RAIN_INTERVALS];
 unsigned       int  rainSignalCountIntervalIndex;
 volatile       int  rainSignalCount;
 unsigned       long rainIntervalBegin;
-               boolean rainTodayReset = false;
+               float rainInterval;
 
 //////////////
 // Set up
@@ -25,6 +26,7 @@ void setupRain(unsigned long now) {
   rainSignalCountIntervalIndex = 0;
   memset(rainSignalCountInterval, 0, sizeof(rainSignalCountInterval));
   rainIntervalBegin = now;
+  rainInterval = 0;
   rainToday = 0;
 }
 
@@ -55,6 +57,8 @@ void loopRain(unsigned long now) {
     }
 #endif
 
+    rainInterval = rainSignalCountInterval[rainSignalCountIntervalIndex] * MM_PER_SIGNAL;
+    rainToday += rainInterval;
     rainSignalCountIntervalIndex += 1;
     if(rainSignalCountIntervalIndex >= RAIN_INTERVALS) {
       rainSignalCountIntervalIndex = 0;
@@ -63,30 +67,24 @@ void loopRain(unsigned long now) {
   }  
 
   // calculate rain total of all intervals
-  int rainSignalCountTotal = 0;
+  rainLastHour = 0;
   for(int i=0;i<RAIN_INTERVALS;i++) {
-    rainSignalCountTotal += rainSignalCountInterval[i];
+    rainLastHour += rainSignalCountInterval[i] * MM_PER_SIGNAL;
   }
-  rainLastHour = rainSignalCountTotal * 0.2794;
 
-  // calculate rainfall today  
+  // reset rainfall today  
   if(hourOfDay == 0) {
     // during summer time this is 1AM rather than midnight since time is GMT
-    if(! rainTodayReset) {
-      // reset once per day
-      rainTodayReset = true;
-      rainToday = rainLastHour; 
-    }
-  }
-  else {
-    // it's later than 1AM now - allow for reset the next time a new day begins
-    rainTodayReset = false;
-  }
-  if(intervalIndexReset) {
-    rainToday += rainLastHour;
+    rainToday = 0; 
   }
 
 #ifdef INFO_WS
+  Serial.print(F("Rainfall ("));
+  Serial.print(RAIN_INTERVAL_SECONDS);
+  Serial.print(F("s): "));
+  Serial.print(rainInterval);
+  Serial.println(F(" mm"));
+
   Serial.print(F("Rainfall ("));
   Serial.print(RAIN_INTERVAL_SECONDS * RAIN_INTERVALS);
   Serial.print(F("s): "));
@@ -106,4 +104,3 @@ void loopRain(unsigned long now) {
 void rainSignal() {
   rainSignalCount++;
 }
-
