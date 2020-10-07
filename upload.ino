@@ -16,8 +16,8 @@
 
 const char SERVER[]     = "weatherstation.wunderground.com";
 const char WEBPAGE[]    = "/weatherstation/updateweatherstation.php";
-// defined in credentials.ino: const char ID[] PROGMEM = "my pws id"; 
-// defined in credentials.ino: const char PASSWORD[] PROGMEM = "my password";
+// defined in credentials.ino: const char ID[]       = "my pws id"; 
+// defined in credentials.ino: const char PASSWORD[] = "my password";
 const char HTTP_HOST[]  = " HTTP/1.0\r\nHost: ";
 const char USER_AGENT[] = "\r\nUser-Agent: Arduino\r\n\r\n";
 byte mac[]      = { 0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02 };
