@@ -23,7 +23,7 @@
 #define ENABLE_WIND_SPEED 1
 #define ENABLE_WIND_DIRECTION 1
 #define ENABLE_RAIN 1
-#define ENABLE_SOLAR_RADIATION 1
+//#define ENABLE_SOLAR_RADIATION 1
 #define ENABLE_HUMIDITY 1
 
 #define WDT_COUNTER_MAX 50  // 50=400s : Number of times of ISR(WDT_vect) to autoreset the board. I will autoreset the board after 8 secondes x counterMax
